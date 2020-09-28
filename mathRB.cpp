@@ -93,21 +93,21 @@ void dydt(double t, double y[], double ydot[], RigidBody *rb) {
 //функция
 void ode(double y0[ ], double yend[ ], int len, double t0,
          double t1, dydt_func dydt){
-
-    yend[1]=y0[1]+0.5;
+    yend[1]=y0[1]+0.001;
+    yend[0]=y0[0]-0.001;
 }
 
 void RunSimulation(RigidBody* rb,double y[])
 {
-    double y0[STATE_SIZE ],
+    double y0[STATE_SIZE],
             yfinal[STATE_SIZE];
 
-    //InitStates(); дать начальные параметры
     State_to_Array(rb,y0);
+    for (int i = 0; i < STATE_SIZE; ++i) {
+        yfinal[i]=0;
+    }
 
 /* copy yfinal back to y0 */
-    for(int i = 0; i < STATE_SIZE; i++)
-        y0[i] = yfinal[i];
     ode(y0, yfinal, STATE_SIZE,timeRB, timeRB+0.1, dydt);
 
 

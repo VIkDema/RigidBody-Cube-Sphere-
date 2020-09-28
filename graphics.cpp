@@ -37,6 +37,9 @@ void timer(int value) {
 
 void display() {
     double* y = new double[STATE_SIZE];
+    for (int i = 0; i <STATE_SIZE; ++i) {
+        y[i]=0;
+    }
     RunSimulation(rb,y);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
@@ -44,7 +47,7 @@ void display() {
 
     // Render a color-cube consisting of 6 quads with different colors
     glLoadIdentity();                 // Reset the model-view matrix
-    glTranslated(0, y[1], -7.0f);  // Move right and into the screen
+    glTranslated(y[0], y[1], -7.0f);  // Move right and into the screen
     //поворот
     glRotatef(angleCube, 1,0.5, 0);
     glEnable (GL_CULL_FACE);
