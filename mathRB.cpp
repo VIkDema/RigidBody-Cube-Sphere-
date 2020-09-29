@@ -21,8 +21,7 @@ void Array_to_State(RigidBody *rb, double *y) {
 /* Compute auxiliary variables... */
 /* v(t) = P(t)/M */
     rb->v = rb->P * (1 / rb->mass);
-/* I−1(t) = R(t)I−1
-bodyR(t)T*/
+/* I−1(t) = R(t)I−1bodyR(t)T*/
     rb->Iinv = rb->R * rb->Ibodyinv * rb->R.transpose();
 /* ω(t) = I−1(t)L(t) */
     rb->omega = rb->Iinv * rb->L;
@@ -42,25 +41,25 @@ void State_to_Array(RigidBody *rb, double *y) {
     *y++ = rb->L[1];
     *y++ = rb->L[2];
 }
+
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
-    rb->force={0,0,0};
-    rb->torque={0,0,0};
+    rb->force = {0, 0, 0};
+    rb->torque = {0, 0, 0};
 }
 
 
-Matrix3d  Star(Vector3d a){
+Matrix3d Star(Vector3d a) {
     Matrix3d matrix_star;
-    matrix_star<<0,-a[2],a[1],
-            a[2],0,-a[0],
-            -a[1],a[0],0;
+    matrix_star << 0, -a[2], a[1],
+            a[2], 0, -a[0],
+            -a[1], a[0], 0;
     return matrix_star;
 }
 
 
 //заносит производную в y
-void ddt_State_to_Array(RigidBody *rb, double *ydot)
-{
+void ddt_State_to_Array(RigidBody *rb, double *ydot) {
 /* copy d
 dt x(t) = v(t) into ydot */
     *ydot++ = rb->v[0];
@@ -69,9 +68,9 @@ dt x(t) = v(t) into ydot */
 /* Compute R˙(t) = ω(t)∗R(t) */
     Matrix3d Rdot = Star(rb->omega) * rb->R;
 /* copy R˙(t) into array */
-    for(int i = 0; i < 3; i++)
-        for(int j = 0; j < 3; j++)
-            *ydot++ = Rdot(i,j);
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            *ydot++ = Rdot(i, j);
     *ydot++ = rb->force[0]; /* d
 dt P(t) = F(t) */
     *ydot++ = rb->force[1];
@@ -85,55 +84,77 @@ dt L(t) = τ(t) */
 //вычисляет производную в момент времени t
 void dydt(double t, double y[], double ydot[], RigidBody *rb) {
 /* put data in y[ ] into Bodies[ ] */
-    State_to_Array(rb, y);
+
     Compute_Force_and_Torque(t, rb);
-    ddt_State_to_Array(rb,ydot);
+    ddt_State_to_Array(rb, ydot);
 }
 
 //функция
-void ode(double y0[ ], double yend[ ], int len, double t0,
-         double t1, dydt_func dydt){
-    yend[1]=y0[1]+0.001;
-    yend[0]=y0[0]-0.001;
+void ode(double y0[], double yend[], int len, double t0,
+         double t1, dydt_func dydt, RigidBody *rb) {
+    /*yend[1]=sin(t0);
+    yend[0]=cos(timeRB);
+    yend[2]=y0[2]-0.01;*/
+
+    double ydydt[len];
+    for (int i = 0; i < len; ++i) {
+        ydydt[i] = 0;
+    }
+    dydt(t0, y0, ydydt, rb);
+
+    for (int i = 0; i < len; ++i) {
+        yend[i] = y0[i] + (t1 - t0) * ydydt[i];
+    }
+
 }
 
-void RunSimulation(RigidBody* rb,double y[])
-{
+void RunSimulation(RigidBody *rb, double y[]) {
+    timeRB = timeRB + 0.03;
     double y0[STATE_SIZE],
             yfinal[STATE_SIZE];
-
-    State_to_Array(rb,y0);
     for (int i = 0; i < STATE_SIZE; ++i) {
-        yfinal[i]=0;
+        yfinal[i] = 0;
+        y0[i] = 0;
     }
+    State_to_Array(rb, y0);
+
 
 /* copy yfinal back to y0 */
-    ode(y0, yfinal, STATE_SIZE,timeRB, timeRB+0.1, dydt);
+    ode(y0, yfinal, STATE_SIZE, timeRB, timeRB + 0.03, dydt, rb);
 
 
-    Array_to_State(rb,yfinal);
+    Array_to_State(rb, yfinal);
 
-    State_to_Array(rb,y);
+    State_to_Array(rb, y);
 }
 
-void InitRigidBody(RigidBody* rb){
+void InitRigidBody(RigidBody *rb) {
     //размер
-    double x0=10,y0=10,z0=10;
-    rb->mass = 31;
+    double x0 = 10, y0 = 5, z0 = 10;
+    rb->mass = 4;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            rb->Ibodyinv(i, j) = 3;
-            rb->R(i, j) = 1+i;
+            rb->R(i, j) = 0;
+            if (i == j) {
+                rb->R(i, j) = 1;
+            }
         }
     }
-    rb->Ibody<<y0 * y0 + z0 * z0,0,0,
-            0, x0 * x0 + z0 * z0,0,
-            0,0, x0 * x0 + y0 * y0;
+    //cubeIbody
+    rb->Ibody << y0 * y0 + z0 * z0, 0, 0,
+            0, x0 * x0 + z0 * z0, 0,
+            0, 0, x0 * x0 + y0 * y0;
+
+    rb->Ibody = rb->Ibody * (rb->mass / 12);
+    rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {4, 5, 6};
-    rb->L = {7.2, 8, 9};
+    rb->P = {1, 1, -1};
+    rb->L = {1, 0, 0};
     double y[STATE_SIZE];
+    for (double &j : y) {
+        j = 0;
+    }
     State_to_Array(rb, y);
     //посчиталось то что нужно
     Array_to_State(rb, y);

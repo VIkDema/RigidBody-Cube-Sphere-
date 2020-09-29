@@ -5,7 +5,6 @@
 
 
 int main(int argc, char **argv) {
-    InitRigidBody(rb);
 
     glutInit(&argc, argv);            // Initialize GLUT
     glutInitDisplayMode(GLUT_DOUBLE); // Enable double buffered mode

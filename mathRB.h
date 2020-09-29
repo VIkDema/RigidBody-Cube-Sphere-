@@ -36,7 +36,7 @@ body (inverse of Ibody) */
     torque;         /* τ(t) */
 };
 
-static  struct RigidBody *rb = new struct RigidBody();
+static struct RigidBody *pRigidBody = new struct RigidBody();
 
 typedef void (*dydt_func)(double t, double y[], double ydot[], RigidBody *rb);
 
@@ -53,7 +53,7 @@ void ddt_State_to_Array(RigidBody *rb, double *ydot);
 void dydt(double t, double y[], double ydot[], RigidBody *rb);
 
 void ode(double y0[], double yend[], int len, double t0,
-         double t1, dydt_func dydt);
+         double t1, dydt_func dydt,RigidBody* rb);
 
 void RunSimulation(RigidBody *rb,double y[]);
 void InitRigidBody(RigidBody* rb);

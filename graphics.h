@@ -7,6 +7,7 @@
 #include <GL/glut.h>
 #include <eigen3/Eigen/Dense>
 #include "mathRB.h"
+#include <math.h>
 using namespace Eigen;
 
 void reshape(GLsizei width, GLsizei height);
