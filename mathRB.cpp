@@ -44,7 +44,7 @@ void State_to_Array(RigidBody *rb, double *y) {
 
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
-    rb->force = {0, 0, 0};
+    rb->force = {0, -0.05, 0};
     rb->torque = {0, 0, 0};
 }
 
@@ -92,9 +92,6 @@ void dydt(double t, double y[], double ydot[], RigidBody *rb) {
 //функция
 void ode(double y0[], double yend[], int len, double t0,
          double t1, dydt_func dydt, RigidBody *rb) {
-    /*yend[1]=sin(t0);
-    yend[0]=cos(timeRB);
-    yend[2]=y0[2]-0.01;*/
 
     double ydydt[len];
     for (int i = 0; i < len; ++i) {
@@ -149,7 +146,7 @@ void InitRigidBody(RigidBody *rb) {
     rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {1, 1, -1};
+    rb->P = {0, 1, -1};
     rb->L = {1, 0, 0};
     double y[STATE_SIZE];
     for (double &j : y) {

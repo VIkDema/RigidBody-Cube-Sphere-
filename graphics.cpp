@@ -67,13 +67,10 @@ void display() {
     glLoadIdentity();                 // Reset the model-view matrix
     glTranslated(y[0], y[1], -7.0 + y[2]);  // Move right and into the screen
     //поворот
-
     //double *angles = new double[3];
     //angleComp(angles, R0, pRigidBody->R);
     //R0=pRigidBody->R;
     //glRotated(angles[0], 0, 0, 1);
-    //glRotated(angles[1], 0, 1, 0);
-    //glRotated(angles[2], 1, 0, 0);
 
     glEnable(GL_CULL_FACE);
 
