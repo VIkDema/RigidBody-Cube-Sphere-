@@ -44,7 +44,7 @@ void State_to_Array(RigidBody *rb, double *y) {
 
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
-    rb->force = {0, -0.05, 0};
+    rb->force = {0, 0.1, 0};
     rb->torque = {0, 0, 0};
 }
 
@@ -127,8 +127,8 @@ void RunSimulation(RigidBody *rb, double y[]) {
 
 void InitRigidBody(RigidBody *rb) {
     //размер
-    double x0 = 10, y0 = 5, z0 = 10;
-    rb->mass = 4;
+    double x0 = 4, y0 = 2, z0 = 4;
+    rb->mass = 5;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             rb->R(i, j) = 0;
@@ -146,8 +146,8 @@ void InitRigidBody(RigidBody *rb) {
     rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {0, 1, -1};
-    rb->L = {1, 0, 0};
+    rb->P = {0, -0.1, -1};
+    rb->L = {0.01, 0.01, 0};
     double y[STATE_SIZE];
     for (double &j : y) {
         j = 0;

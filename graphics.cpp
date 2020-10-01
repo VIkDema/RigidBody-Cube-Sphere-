@@ -5,12 +5,11 @@
 #include "graphics.h"
 
 int refreshMills = 15;
-Matrix3d R0;
+static double *y = new double[STATE_SIZE];
+static double* m = new double[16];
+
 
 void angleComp(double *yend, Matrix3d R0, Matrix3d Rt) {
-//R0 <<       1, 0, 0,
-    //           0, 1, 0,
-    //          0, 0, 1;
     double cosp = 0;
     for (int i = 0; i < 3; ++i) {
         cosp = (double )(R0(0, i) * Rt(0, i) + R0(1, i) * Rt(1, i) + R0(2, i) * Rt(2, i)) /
@@ -36,9 +35,16 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
 }
 
 void initGL() {
-    R0 << 1, 0, 0,
-            0, 1, 0,
-            0, 0, 1;
+    for (int i = 0; i < STATE_SIZE; ++i) {
+        y[i] = 0;
+    }
+    for (int i = 0; i < 16; ++i) {
+        m[i]=0;
+    }
+    m[0]=1;
+    m[5]=1;
+    m[10]=1;
+    m[15]=1;
     InitRigidBody(pRigidBody);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClearDepth(1.0f);// Set background depth to farthest
@@ -54,10 +60,7 @@ void timer(int value) {
 }
 
 void display() {
-    double *y = new double[STATE_SIZE];
-    for (int i = 0; i < STATE_SIZE; ++i) {
-        y[i] = 0;
-    }
+
     RunSimulation(pRigidBody, y);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
@@ -65,7 +68,18 @@ void display() {
 
     // Render a color-cube consisting of 6 quads with different colors
     glLoadIdentity();                 // Reset the model-view matrix
+    for (int i = 0; i < 3; ++i) {
+            m[0+i*4]=y[3+i];
+            m[1+i*4]=y[6+i];
+            m[2+i*4]=y[9+i];
+    }
+
+
     glTranslated(y[0], y[1], -7.0 + y[2]);  // Move right and into the screen
+    glMultMatrixd(m);
+    //glLoadMatrixd(m);
+
+
     //поворот
     //double *angles = new double[3];
     //angleComp(angles, R0, pRigidBody->R);
@@ -122,6 +136,5 @@ void display() {
     // Render a pyramid consists of 4 triangles
     glutSwapBuffers();  // Swap the front and back frame buffers (double buffering)
     //angleCube -= 1;
-   // delete[] angles;
     glutTimerFunc(0, timer, 0);
 }
