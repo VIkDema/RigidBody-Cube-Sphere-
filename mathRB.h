@@ -34,6 +34,7 @@ body (inverse of Ibody) */
 /* Computed quantities */
     Vector3d force,    /* F(t) */
     torque;         /* τ(t) */
+    double x0,y0,z0;
 };
 
 static struct RigidBody *pRigidBody = new struct RigidBody();

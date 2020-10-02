@@ -25,6 +25,7 @@ void Array_to_State(RigidBody *rb, double *y) {
     rb->Iinv = rb->R * rb->Ibodyinv * rb->R.transpose();
 /* ω(t) = I−1(t)L(t) */
     rb->omega = rb->Iinv * rb->L;
+
 }
 
 void State_to_Array(RigidBody *rb, double *y) {
@@ -44,7 +45,7 @@ void State_to_Array(RigidBody *rb, double *y) {
 
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
-    rb->force = {0, 0.1, 0};
+    rb->force = {0, 0, 0};
     rb->torque = {0, 0, 0};
 }
 
@@ -121,13 +122,29 @@ void RunSimulation(RigidBody *rb, double y[]) {
 
 
     Array_to_State(rb, yfinal);
+    //ортоганализация матрицы вращения
+    Vector3d x_v = rb->R.col(0);
+    Vector3d y_v = rb->R.col(1);
+    Vector3d z_v = rb->R.col(2);
+    x_v.normalize();
+    y_v.normalize();
+    z_v.normalize();
+
+    y_v = y_v - (x_v[0] * y_v[0] + x_v[1] * y_v[1] + x_v[2] * y_v[2])  * x_v;
+    z_v=z_v-(x_v[0] * z_v[0] + x_v[1] * z_v[1] + x_v[2] * z_v[2]) * x_v-(z_v[0] * y_v[0] + z_v[1] * y_v[1] + z_v[2] * y_v[2]) * y_v;
+    rb->R.col(0) = x_v;
+    rb->R.col(1) = y_v;
+    rb->R.col(2) = z_v;
 
     State_to_Array(rb, y);
 }
 
 void InitRigidBody(RigidBody *rb) {
     //размер
-    double x0 = 4, y0 = 2, z0 = 4;
+    double x0 = 2, y0 = 1, z0 = 1;
+    rb->x0 = x0;
+    rb->y0 = y0;
+    rb->z0 = z0;
     rb->mass = 5;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -146,8 +163,8 @@ void InitRigidBody(RigidBody *rb) {
     rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {0, -0.1, -1};
-    rb->L = {0.01, 0.01, 0};
+    rb->P = {0, 0, 0};
+    rb->L = {10, 0, 0};
     double y[STATE_SIZE];
     for (double &j : y) {
         j = 0;

@@ -31,10 +31,15 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
     glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
     glLoadIdentity();             // Reset
     // Enable perspective projection with fovy, aspect, zNear and zFar
-    gluPerspective(45.0f, aspect, 0.1f, 100.0f);
+    //gluPerspective(45.0f, aspect, 0.1f, 100.0f);
+    gluPerspective(30.0f, aspect, 1.0f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0,100,0,0,0,0,0,0,1);
 }
 
 void initGL() {
+
     for (int i = 0; i < STATE_SIZE; ++i) {
         y[i] = 0;
     }
@@ -73,64 +78,59 @@ void display() {
             m[1+i*4]=y[6+i];
             m[2+i*4]=y[9+i];
     }
-
-
-    glTranslated(y[0], y[1], -7.0 + y[2]);  // Move right and into the screen
+    glTranslated(y[0], y[1], -14.0 + y[2]);  // Move right and into the screen
     glMultMatrixd(m);
     //glLoadMatrixd(m);
 
-
-    //поворот
-    //double *angles = new double[3];
-    //angleComp(angles, R0, pRigidBody->R);
-    //R0=pRigidBody->R;
-    //glRotated(angles[0], 0, 0, 1);
 
     glEnable(GL_CULL_FACE);
 
     glBegin(GL_QUADS);                // Begin drawing the color cube with 6 quads
     // Top face (y = 1.0f)
     // Define vertices in counter-clockwise (CCW) order with normal pointing out
-    glColor3f(0.0f, 1.0f, 0.0f);     // Green
-    glVertex3f(1.0f, 0.5f, -1.0f);
-    glVertex3f(-1.0f, 0.5f, -1.0f);
-    glVertex3f(-1.0f, 0.5f, 1.0f);
-    glVertex3f(1.0f, 0.5f, 1.0f);
+    glColor3d(0.0, 1.0, 0.0);     // Green
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
 
     // Bottom face (y = -1.0f)
-    glColor3f(1.0f, 0.5f, 0.0f);     // Orange
-    glVertex3f(1.0f, -0.5f, 1.0f);
-    glVertex3f(-1.0f, -0.5f, 1.0f);
-    glVertex3f(-1.0f, -0.5f, -1.0f);
-    glVertex3f(1.0f, -0.5f, -1.0f);
+    glColor3d(1.0, 0.5, 0.0);     // Orange
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
 
     // Front face  (z = 1.0f)
-    glColor3f(1.0f, 0.0f, 0.0f);     // Red
-    glVertex3f(1.0f, 0.5f, 1.0f);
-    glVertex3f(-1.0f, 0.5f, 1.0f);
-    glVertex3f(-1.0f, -0.5f, 1.0f);
-    glVertex3f(1.0f, -0.5f, 1.0f);
+    glColor3d(1.0, 0.0, 0.0);
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+
+
 
     // Back face (z = -1.0f)
-    glColor3f(1.0f, 1.0f, 0.0f);     // Yellow
-    glVertex3f(1.0f, -0.5f, -1.0f);
-    glVertex3f(-1.0f, -0.5f, -1.0f);
-    glVertex3f(-1.0f, 0.5f, -1.0f);
-    glVertex3f(1.0f, 0.5f, -1.0f);
+    glColor3d(1.0, 1.0, 0.0);     // Yellow
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
 
     // Left face (x = -1.0f)
-    glColor3f(0.0f, 0.0f, 1.0f);     // Blue
-    glVertex3f(-1.0f, 0.5f, 1.0f);
-    glVertex3f(-1.0f, 0.5f, -1.0f);
-    glVertex3f(-1.0f, -0.5f, -1.0f);
-    glVertex3f(-1.0f, -0.5f, 1.0f);
+    glColor3d(0.0, 0.0, 1.0);     // Blue
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(-pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+
 
     // Right face (x = 1.0f)
-    glColor3f(1.0f, 0.0f, 1.0f);     // Magenta
-    glVertex3f(1.0f, 0.5f, -1.0f);
-    glVertex3f(1.0f, 0.5f, 1.0f);
-    glVertex3f(1.0f, -0.5f, 1.0f);
-    glVertex3f(1.0f, -0.5f, -1.0f);
+    glColor3d(-1.0, 0.0, 1.0);     // Magenta
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, -pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, pRigidBody->z0);
+    glVertex3d(pRigidBody->x0, -pRigidBody->y0, -pRigidBody->z0);
     glEnd();
 
     // Render a pyramid consists of 4 triangles
