@@ -46,7 +46,9 @@ void State_to_Array(RigidBody *rb, double *y) {
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
     rb->force = {0, 0, 0};
-    rb->torque = {0, 0, 0};
+    Vector3d r={0,0,0};
+
+    rb->torque = rb->force.cross(r);
 }
 
 
@@ -104,6 +106,27 @@ void ode(double y0[], double yend[], int len, double t0,
         yend[i] = y0[i] + (t1 - t0) * ydydt[i];
     }
 
+    /*
+    double ydydt1[len];
+    for (int i = 0; i < len; ++i) {
+        ydydt1[i] = 0;
+    }
+    dydt(t0,y0,ydydt1,rb);
+    double ydydt2[len];
+    for (int i = 0; i < len; ++i) {
+        ydydt2[i] = 0;
+    }
+    double y1[len];
+    for (int i = 0; i < len; ++i) {
+        y1[i] = y0[i]+(t1 - t0)/2*ydydt1[i];
+    }
+
+    dydt(t0+(t1 - t0)/2,y1,ydydt2,rb);
+    for (int i = 0; i < len; ++i) {
+        yend[i] = y0[i]+(t1 - t0)*ydydt2[i];
+    }
+    */
+
 }
 
 void RunSimulation(RigidBody *rb, double y[]) {
@@ -141,11 +164,11 @@ void RunSimulation(RigidBody *rb, double y[]) {
 
 void InitRigidBody(RigidBody *rb) {
     //размер
-    double x0 = 2, y0 = 1, z0 = 1;
+    double x0 = 1, y0 = 1, z0 = 1;
     rb->x0 = x0;
     rb->y0 = y0;
     rb->z0 = z0;
-    rb->mass = 5;
+    rb->mass = 10;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             rb->R(i, j) = 0;
@@ -163,8 +186,8 @@ void InitRigidBody(RigidBody *rb) {
     rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {0, 0, 0};
-    rb->L = {10, 0, 0};
+    rb->P = {0, 1, 0};
+    rb->L = {0, 0, 0};
     double y[STATE_SIZE];
     for (double &j : y) {
         j = 0;
