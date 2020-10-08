@@ -95,7 +95,7 @@ void dydt(double t, double y[], double ydot[], RigidBody *rb) {
 //функция
 void ode(double y0[], double yend[], int len, double t0,
          double t1, dydt_func dydt, RigidBody *rb) {
-
+    /*
     double ydydt[len];
     for (int i = 0; i < len; ++i) {
         ydydt[i] = 0;
@@ -105,8 +105,7 @@ void ode(double y0[], double yend[], int len, double t0,
     for (int i = 0; i < len; ++i) {
         yend[i] = y0[i] + (t1 - t0) * ydydt[i];
     }
-
-    /*
+*/
     double ydydt1[len];
     for (int i = 0; i < len; ++i) {
         ydydt1[i] = 0;
@@ -125,7 +124,6 @@ void ode(double y0[], double yend[], int len, double t0,
     for (int i = 0; i < len; ++i) {
         yend[i] = y0[i]+(t1 - t0)*ydydt2[i];
     }
-    */
 
 }
 
@@ -187,7 +185,7 @@ void InitRigidBody(RigidBody *rb) {
 
     rb->x = {0, 0, 0};
     rb->P = {0, 1, 0};
-    rb->L = {0, 0, 0};
+    rb->L = {0, 0, 10};
     double y[STATE_SIZE];
     for (double &j : y) {
         j = 0;
