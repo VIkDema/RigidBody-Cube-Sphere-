@@ -9,16 +9,6 @@ static double *y = new double[STATE_SIZE];
 static double* m = new double[16];
 
 
-void angleComp(double *yend, Matrix3d R0, Matrix3d Rt) {
-    double cosp = 0;
-    for (int i = 0; i < 3; ++i) {
-        cosp = (double )(R0(0, i) * Rt(0, i) + R0(1, i) * Rt(1, i) + R0(2, i) * Rt(2, i)) /
-               (sqrt(R0(0, i) * R0(0, i) + R0(1, i) * R0(1, i) + R0(2, i) * R0(2, i)) *
-                sqrt(Rt(0, i) * Rt(0, i) + Rt(1, i) * Rt(1, i) + Rt(2, i) * Rt(2, i)));
-        yend[i]=acos(cosp)*180/M_PI;
-    }
-}
-
 void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
     // Compute aspect ratio of the new window
     if (height == 0) height = 1;                // To prevent divide by 0
@@ -78,7 +68,7 @@ void display() {
             m[1+i*4]=y[6+i];
             m[2+i*4]=y[9+i];
     }
-    glTranslated(y[0], y[1], -14.0 + y[2]);  // Move right and into the screen
+    glTranslated(y[0], y[1], -14 + y[2]);  // Move right and into the screen
     glMultMatrixd(m);
     //glLoadMatrixd(m);
 

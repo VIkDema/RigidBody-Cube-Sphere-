@@ -2,6 +2,7 @@
 // Created by viktor on 25.09.2020.
 //
 
+#include <iostream>
 #include "mathRB.h"
 
 
@@ -46,7 +47,7 @@ void State_to_Array(RigidBody *rb, double *y) {
 //вычисляет силу и крутящий момент
 void Compute_Force_and_Torque(double t, RigidBody *rb) {
     rb->force = {0, 0, 0};
-    Vector3d r={0,0,0};
+    Vector3d r = {0, 0, 0};
 
     rb->torque = rb->force.cross(r);
 }
@@ -110,25 +111,32 @@ void ode(double y0[], double yend[], int len, double t0,
     for (int i = 0; i < len; ++i) {
         ydydt1[i] = 0;
     }
-    dydt(t0,y0,ydydt1,rb);
+    dydt(t0, y0, ydydt1, rb);
     double ydydt2[len];
     for (int i = 0; i < len; ++i) {
         ydydt2[i] = 0;
     }
     double y1[len];
     for (int i = 0; i < len; ++i) {
-        y1[i] = y0[i]+(t1 - t0)/2*ydydt1[i];
+        y1[i] = y0[i] + (t1 - t0) / 2 * ydydt1[i];
     }
 
-    dydt(t0+(t1 - t0)/2,y1,ydydt2,rb);
+    dydt(t0 + (t1 - t0) / 2, y1, ydydt2, rb);
     for (int i = 0; i < len; ++i) {
-        yend[i] = y0[i]+(t1 - t0)*ydydt2[i];
+        yend[i] = y0[i] + (t1 - t0) * ydydt2[i];
     }
 
 }
+void printInvariant(RigidBody* rb){
+   std::cout<<(0.5)*rb->mass*rb->v.transpose()*rb->v+0.5*rb->omega.transpose()*rb->Ibody*rb->omega<<"(time: "<<timeRB<<")"<<"\n";
+
+}
+
+
 
 void RunSimulation(RigidBody *rb, double y[]) {
-    timeRB = timeRB + 0.03;
+    timeRB = timeRB + 0.015;
+    printInvariant(rb);
     double y0[STATE_SIZE],
             yfinal[STATE_SIZE];
     for (int i = 0; i < STATE_SIZE; ++i) {
@@ -139,34 +147,36 @@ void RunSimulation(RigidBody *rb, double y[]) {
 
 
 /* copy yfinal back to y0 */
-    ode(y0, yfinal, STATE_SIZE, timeRB, timeRB + 0.03, dydt, rb);
+    ode(y0, yfinal, STATE_SIZE, timeRB, timeRB + 0.015, dydt, rb);
 
 
     Array_to_State(rb, yfinal);
     //ортоганализация матрицы вращения
-    Vector3d x_v = rb->R.col(0);
-    Vector3d y_v = rb->R.col(1);
-    Vector3d z_v = rb->R.col(2);
-    x_v.normalize();
-    y_v.normalize();
-    z_v.normalize();
-
-    y_v = y_v - (x_v[0] * y_v[0] + x_v[1] * y_v[1] + x_v[2] * y_v[2])  * x_v;
-    z_v=z_v-(x_v[0] * z_v[0] + x_v[1] * z_v[1] + x_v[2] * z_v[2]) * x_v-(z_v[0] * y_v[0] + z_v[1] * y_v[1] + z_v[2] * y_v[2]) * y_v;
-    rb->R.col(0) = x_v;
-    rb->R.col(1) = y_v;
-    rb->R.col(2) = z_v;
+    Vector3d v1 = rb->R.col(0);
+    Vector3d v2 = rb->R.col(1);
+    Vector3d v3 = rb->R.col(2);
+    v1.normalize();
+    v2=v2-(v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])*v1;
+    v2.normalize();
+    v3 = v3-(v1[0]*v3[0]+v1[1]*v3[1]+v1[2]*v3[2])*v1-(v3[0]*v2[0]+v3[1]*v2[1]+v3[2]*v2[2])*v2;
+    v3.normalize();
+    rb->R.col(0)=v1;
+    rb->R.col(1)=v2;
+    rb->R.col(2)=v3;
 
     State_to_Array(rb, y);
 }
 
 void InitRigidBody(RigidBody *rb) {
     //размер
-    double x0 = 1, y0 = 1, z0 = 1;
+    std::cout << "Введите размеры бруска(желательно до двух):\n";
+    double x0 = 1, y0 = 2, z0 = 1;
+    cin >> x0 >> y0 >> z0;
     rb->x0 = x0;
     rb->y0 = y0;
     rb->z0 = z0;
-    rb->mass = 10;
+    std::cout << "Введите массу бруска:\n";
+    cin>>rb->mass;
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             rb->R(i, j) = 0;
@@ -184,8 +194,8 @@ void InitRigidBody(RigidBody *rb) {
     rb->Ibodyinv = rb->Ibody.reverse();
 
     rb->x = {0, 0, 0};
-    rb->P = {0, 1, 0};
-    rb->L = {0, 0, 10};
+    rb->P = {0, 0, 0};
+    rb->L = {0.5, 1, 1};
     double y[STATE_SIZE];
     for (double &j : y) {
         j = 0;

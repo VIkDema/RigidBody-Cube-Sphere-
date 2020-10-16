@@ -37,6 +37,8 @@ body (inverse of Ibody) */
     double x0,y0,z0;
 };
 
+void printInvariant(RigidBody *rb);
+
 static struct RigidBody *pRigidBody = new struct RigidBody();
 
 typedef void (*dydt_func)(double t, double y[], double ydot[], RigidBody *rb);
@@ -58,6 +60,6 @@ void ode(double y0[], double yend[], int len, double t0,
 
 void RunSimulation(RigidBody *rb,double y[]);
 void InitRigidBody(RigidBody* rb);
-
+void printInvariant(RigidBody* rb);
 
 #endif //MATHLABS_MATHRB_H
