@@ -128,8 +128,7 @@ void ode(double y0[], double yend[], int len, double t0,
 
 }
 void printInvariant(RigidBody* rb){
-   std::cout<<(0.5)*rb->mass*rb->v.transpose()*rb->v+0.5*rb->omega.transpose()*rb->Ibody*rb->omega<<"(time: "<<timeRB<<")"<<"\n";
-
+   std::cout<<(0.5)*rb->mass*rb->v.transpose()*rb->v+0.5*rb->omega.transpose()*rb->L<<"(time: "<<timeRB<<")"<<"\n";
 }
 
 
