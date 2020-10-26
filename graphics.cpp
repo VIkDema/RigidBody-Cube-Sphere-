@@ -51,7 +51,7 @@ void initGL() {
 
 void timer(int value) {
     glutPostRedisplay();      // Post re-paint request to activate display()
-    glutTimerFunc(refreshMills, timer, 0); // next timer call milliseconds later
+   // glutTimerFunc(refreshMills, timer, 0); // next timer call milliseconds later
 }
 
 void display() {
@@ -126,5 +126,5 @@ void display() {
     // Render a pyramid consists of 4 triangles
     glutSwapBuffers();  // Swap the front and back frame buffers (double buffering)
     //angleCube -= 1;
-    glutTimerFunc(0, timer, 0);
+    glutTimerFunc(refreshMills, timer, 0);
 }
