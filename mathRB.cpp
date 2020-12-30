@@ -173,7 +173,7 @@ void RunSimulation(RigidBody *rb, double y[]) {
     State_to_Array(rb, y);
 }
 
-void InitRigidBody(RigidBody *rb) {
+void InitRigidBody(RigidBody *rb,int mode) {
     //размер
     double y[STATE_SIZE];
     if (mode == 1) {
@@ -208,7 +208,6 @@ void InitRigidBody(RigidBody *rb) {
             j = 0;
         }
     }else{
-
         std::cout << "Enter the radius of the sphere:\n";
         double x0 = 1;
         cin >> x0;

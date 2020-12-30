@@ -6,14 +6,12 @@
 #define MATHLABS_MATHRB_H
 
 #include <eigen3/Eigen/Dense>
-static int mode = 0;
 using namespace std;
 using namespace Eigen;
 
 
 #define STATE_SIZE 18
-
-static double  timeRB=0;
+static double timeRB=0;
 
 
 struct RigidBody {
@@ -59,7 +57,6 @@ void ode(double y0[], double yend[], int len, double t0,
          double t1, dydt_func dydt,RigidBody* rb);
 
 void RunSimulation(RigidBody *rb,double y[]);
-void InitRigidBody(RigidBody* rb);
-void printInvariant(RigidBody* rb);
+void InitRigidBody(RigidBody* rb,int mode);
 
 #endif //MATHLABS_MATHRB_H

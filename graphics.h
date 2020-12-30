@@ -12,7 +12,7 @@ using namespace Eigen;
 
 void reshape(GLsizei width, GLsizei height);
 void display();
-void initGL();
+void initGL(int mode);
 void display_sp();
 
 

@@ -5,6 +5,7 @@
 
 
 int main(int argc, char **argv) {
+    int mode=0;
     glutInit(&argc, argv);            // Initialize GLUT
     glutInitDisplayMode(GLUT_DOUBLE); // Enable double buffered mode
     glutInitWindowSize(640, 480);   // Set the window's initial width & height
@@ -18,7 +19,7 @@ int main(int argc, char **argv) {
         glutDisplayFunc(display);
     }   // Register callback handler for window re-paint event
     glutReshapeFunc(reshape);       // Register callback handler for window re-size event
-    initGL();                       // Our own OpenGL initialization
+    initGL(mode);                       // Our own OpenGL initialization
     glutMainLoop();                 // Enter the infinite event-processing loop
 
 

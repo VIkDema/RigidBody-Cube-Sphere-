@@ -28,7 +28,7 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
     gluLookAt(0,100,0,0,0,0,0,0,1);
 }
 
-void initGL() {
+void initGL(int mode) {
 
     for (int i = 0; i < STATE_SIZE; ++i) {
         y[i] = 0;
@@ -40,7 +40,7 @@ void initGL() {
     m[5]=1;
     m[10]=1;
     m[15]=1;
-    InitRigidBody(pRigidBody);
+    InitRigidBody(pRigidBody,mode);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
     glClearDepth(1.0f);// Set background depth to farthest
     glEnable(GL_DEPTH_TEST);   // Enable depth testing for z-culling
