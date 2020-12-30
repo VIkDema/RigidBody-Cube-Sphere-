@@ -6,7 +6,7 @@
 #define MATHLABS_MATHRB_H
 
 #include <eigen3/Eigen/Dense>
-
+static int mode = 0;
 using namespace std;
 using namespace Eigen;
 

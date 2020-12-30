@@ -96,41 +96,47 @@ void dydt(double t, double y[], double ydot[], RigidBody *rb) {
 //функция
 void ode(double y0[], double yend[], int len, double t0,
          double t1, dydt_func dydt, RigidBody *rb) {
-    /*
-    double ydydt[len];
+    State_to_Array(rb, y0);
+    double Y1[len];
+    double Y1withy0[len];
+    double Y2[len];
+    double Y2withy0[len];
+    double Y3[len];
+    double Y3withy0[len];
+    double Y4[len];
+    double Y4withy0[len];
+    dydt(t0, y0, Y1, rb);
     for (int i = 0; i < len; ++i) {
-        ydydt[i] = 0;
+        Y1[i] = (t1 - t0) * Y1[i];
+        Y1withy0[i] = y0[i] + Y1[i] / 2.0;
     }
-    dydt(t0, y0, ydydt, rb);
+    State_to_Array(rb, Y1withy0);
+    dydt(t0 + (t1 - t0) / 2, Y1withy0, Y2, rb);
+    for (int i = 0; i < len; ++i) {
+        Y2[i] = (t1 - t0) * Y2[i];
+        Y2withy0[i] = y0[i] + Y2[i] / 2.0;
+    }
+    State_to_Array(rb, Y2withy0);
+    dydt(t0 + (t1 - t0) / 2, Y2withy0, Y3, rb);
+    for (int i = 0; i < len; ++i) {
+        Y3[i] = (t1 - t0) * Y3[i];
+        Y3withy0[i] = y0[i] + Y3[i];
+    }
+    State_to_Array(rb, Y3withy0);
+    dydt(t0 + (t1 - t0) / 2, Y3withy0, Y4, rb);
+    for (int i = 0; i < len; ++i) {
+        Y4[i] = (t1 - t0) * Y4[i];
+    }
 
     for (int i = 0; i < len; ++i) {
-        yend[i] = y0[i] + (t1 - t0) * ydydt[i];
+        yend[i] = y0[i] + (Y1[i] + 2 * Y2[i] + 2 * Y3[i] + Y4[i]) / 6.0;
     }
-*/
-    double ydydt1[len];
-    for (int i = 0; i < len; ++i) {
-        ydydt1[i] = 0;
-    }
-    dydt(t0, y0, ydydt1, rb);
-    double ydydt2[len];
-    for (int i = 0; i < len; ++i) {
-        ydydt2[i] = 0;
-    }
-    double y1[len];
-    for (int i = 0; i < len; ++i) {
-        y1[i] = y0[i] + (t1 - t0) / 2 * ydydt1[i];
-    }
-
-    dydt(t0 + (t1 - t0) / 2, y1, ydydt2, rb);
-    for (int i = 0; i < len; ++i) {
-        yend[i] = y0[i] + (t1 - t0) * ydydt2[i];
-    }
-
 }
-void printInvariant(RigidBody* rb){
-   std::cout<<(0.5)*rb->mass*rb->v.transpose()*rb->v+0.5*rb->omega.transpose()*rb->L<<"(time: "<<timeRB<<")"<<"\n";
-}
 
+void printInvariant(RigidBody *rb) {
+    std::cout << (0.5) * rb->mass * rb->v.transpose() * rb->v + 0.5 * rb->omega.transpose() * rb->L << "(time: "
+              << timeRB << ")" << "\n";
+}
 
 
 void RunSimulation(RigidBody *rb, double y[]) {
@@ -155,49 +161,85 @@ void RunSimulation(RigidBody *rb, double y[]) {
     Vector3d v2 = rb->R.col(1);
     Vector3d v3 = rb->R.col(2);
     v1.normalize();
-    v2=v2-(v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])*v1;
+    v2 = v2 - (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) * v1;
     v2.normalize();
-    v3 = v3-(v1[0]*v3[0]+v1[1]*v3[1]+v1[2]*v3[2])*v1-(v3[0]*v2[0]+v3[1]*v2[1]+v3[2]*v2[2])*v2;
+    v3 = v3 - (v1[0] * v3[0] + v1[1] * v3[1] + v1[2] * v3[2]) * v1 -
+         (v3[0] * v2[0] + v3[1] * v2[1] + v3[2] * v2[2]) * v2;
     v3.normalize();
-    rb->R.col(0)=v1;
-    rb->R.col(1)=v2;
-    rb->R.col(2)=v3;
+    rb->R.col(0) = v1;
+    rb->R.col(1) = v2;
+    rb->R.col(2) = v3;
 
     State_to_Array(rb, y);
 }
 
 void InitRigidBody(RigidBody *rb) {
     //размер
-    std::cout << "Введите размеры бруска(желательно до двух):\n";
-    double x0 = 1, y0 = 2, z0 = 1;
-    cin >> x0 >> y0 >> z0;
-    rb->x0 = x0;
-    rb->y0 = y0;
-    rb->z0 = z0;
-    std::cout << "Введите массу бруска:\n";
-    cin>>rb->mass;
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            rb->R(i, j) = 0;
-            if (i == j) {
-                rb->R(i, j) = 1;
+    double y[STATE_SIZE];
+    if (mode == 1) {
+        std::cout << "Enter the dimensions of the block (preferably up to two): \n";
+        double x0 = 1, y0 = 2, z0 = 1;
+        cin >> x0 >> y0 >> z0;
+        rb->x0 = x0;
+        rb->y0 = y0;
+        rb->z0 = z0;
+        std::cout << "Enter the mass of the bar:\n";
+        cin >> rb->mass;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                rb->R(i, j) = 0;
+                if (i == j) {
+                    rb->R(i, j) = 1;
+                }
             }
         }
-    }
-    //cubeIbody
-    rb->Ibody << y0 * y0 + z0 * z0, 0, 0,
-            0, x0 * x0 + z0 * z0, 0,
-            0, 0, x0 * x0 + y0 * y0;
+        //cubeIbody
+        rb->Ibody << y0 * y0 + z0 * z0, 0, 0,
+                0, x0 * x0 + z0 * z0, 0,
+                0, 0, x0 * x0 + y0 * y0;
 
-    rb->Ibody = rb->Ibody * (rb->mass / 12);
-    rb->Ibodyinv = rb->Ibody.reverse();
+        rb->Ibody = rb->Ibody * (rb->mass / 12);
+        rb->Ibodyinv = rb->Ibody.reverse();
 
-    rb->x = {0, 0, 0};
-    rb->P = {0, 0, 0};
-    rb->L = {0.5, 1, 1};
-    double y[STATE_SIZE];
-    for (double &j : y) {
-        j = 0;
+        rb->x = {0, 0, 0};
+        rb->P = {0, 0, 0};
+        rb->L = {0.5, 1, 1};
+        for (double &j : y) {
+            j = 0;
+        }
+    }else{
+
+        std::cout << "Enter the radius of the sphere:\n";
+        double x0 = 1;
+        cin >> x0;
+        rb->x0 = x0;
+        rb->y0 = x0;
+        rb->z0 = x0;
+        std::cout << "Enter the mass of the sphere:\n";
+        cin >> rb->mass;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                rb->R(i, j) = 0;
+                if (i == j) {
+                    rb->R(i, j) = 1;
+                }
+            }
+        }
+
+        double k=rb->mass/5*2;
+
+        rb->Ibody << x0, 0, 0,
+                0, x0*x0, 0,
+                0, 0, x0*x0;
+
+        rb->Ibodyinv = rb->Ibody.reverse();
+
+        rb->x= {0, 0, 0};
+        rb->P= {0, 0, 0};
+        rb->L= {1, 0, 1};
+        for (double &j : y) {
+            j = 0;
+        }
     }
     State_to_Array(rb, y);
     //посчиталось то что нужно

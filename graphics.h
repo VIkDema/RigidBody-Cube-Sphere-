@@ -13,6 +13,7 @@ using namespace Eigen;
 void reshape(GLsizei width, GLsizei height);
 void display();
 void initGL();
+void display_sp();
 
 
 #endif //MATHLABS_GRAPHICS_H

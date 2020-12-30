@@ -128,3 +128,30 @@ void display() {
     //angleCube -= 1;
     glutTimerFunc(refreshMills, timer, 0);
 }
+void display_sp() {
+
+    RunSimulation(pRigidBody, y);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+
+    glLoadIdentity();//сбрасывает матрицу в состояние по умолчанию
+
+    for (int i = 0; i < 3; ++i) {
+        m[0+i*4]=y[3+i];
+        m[1+i*4]=y[6+i];
+        m[2+i*4]=y[9+i];
+    }
+    glTranslated(y[0], y[1], -14.0 + y[2]);//переводит вектор в матрицу
+    glMultMatrixd(m);
+
+    glEnable(GL_CULL_FACE);
+
+    glColor3d(0.5, 1, 0.83);
+
+    glutWireSphere(pRigidBody->x0,30,36);
+
+    glutSwapBuffers(); //меняет передний и задний буффер(в заднем обрабатывается следующий кадр)
+
+    glutTimerFunc(refreshMills, timer, 0);//таймер для вызова функции
+}
